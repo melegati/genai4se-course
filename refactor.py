@@ -1,13 +1,9 @@
-import sys
-import argparse
 import os
-
-from DeveloperAIHandler import DeveloperAIHandler, TEST_FAILED, TEST_PASSED
+import argparse
+from DeveloperAIHandler import DeveloperAIHandler, TEST_PASSED, TEST_FAILED
 from utils import str2bool, how_many_to_skip
 
-sys.path.append("..")
-
-class TDDRunner():
+class RefactorRunner():
 
     def __init__(self, test_file, code_file, full_context, print_context, print_message, max_number_repetitions):
 
@@ -27,26 +23,32 @@ class TDDRunner():
     def run(self):
         result = self.handler.execute_tests()
 
-        if result == TEST_PASSED:
-            print("The test case is already fulfilled, the code was not modified by ChatGPT.")
+        if result != TEST_PASSED:
+            print("The test cases are failing, please fix the code before asking to refactor it.")
             return
-
+        
         counter = 0
+        starting_complexity = self.handler.calculate_cyclomatic_complexity()
         self.handler.backup_code_file(self.skip)
         while counter < self.max_number_repetitions:
             counter += 1
-            self.handler.send_message(self.handler.create_tdd_prompt(), "{}_{}".format(self.skip, counter))
+            self.handler.send_message(self.handler.create_refactor_prompt(), "{}_{}".format(self.skip, counter))
             self.handler.save_response_to_code_file()
             result = self.handler.execute_tests()
 
             if result == TEST_PASSED:
-                print("Test case passed! You can inspect the updated code now!")
-                break
+                print("Test case passed!Checking complexity now!")
+                current_complexity = self.handler.calculate_cyclomatic_complexity()
+                if current_complexity < starting_complexity:
+                    print("Complexity decreased from {} to {}. Done.".format(starting_complexity, current_complexity))
+                    return
+                else:
+                    print("Complexity increased from {} to {}. Retrying.".format(starting_complexity, current_complexity))
+                    self.handler.restore_code_file(self.skip)
             if result == TEST_FAILED:
                 print("Test failed! Resending it to ChatGPT...")
 
-        if result == TEST_FAILED:
-            self.handler.restore_code_file(self.skip)
+        self.handler.restore_code_file(self.skip)
 
 
 def params():
@@ -70,7 +72,7 @@ def params():
 if __name__ == '__main__':
     parser = params()
 
-    runner = TDDRunner(
+    runner = RefactorRunner(
         parser.test_file,
         parser.code_file,
         parser.full_context,
