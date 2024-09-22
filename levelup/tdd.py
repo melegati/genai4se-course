@@ -2,8 +2,8 @@ import sys
 import argparse
 import os
 
-from DeveloperAIHandler import DeveloperAIHandler, TEST_FAILED, TEST_PASSED
-from utils import str2bool, how_many_to_skip
+from levelup.DeveloperAIHandler import DeveloperAIHandler, TEST_FAILED, TEST_PASSED
+from levelup.utils import str2bool, how_many_to_skip
 
 sys.path.append("..")
 

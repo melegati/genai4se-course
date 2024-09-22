@@ -1,7 +1,7 @@
 import os
 import argparse
-from DeveloperAIHandler import DeveloperAIHandler, TEST_PASSED, TEST_FAILED
-from utils import str2bool, how_many_to_skip
+from levelup.DeveloperAIHandler import DeveloperAIHandler, TEST_PASSED, TEST_FAILED
+from levelup.utils import str2bool, how_many_to_skip
 
 class RefactorRunner():
 
