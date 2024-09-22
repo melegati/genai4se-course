@@ -2,17 +2,18 @@ from openai import OpenAI
 import subprocess
 import shutil
 import lizard
+import os
 
 TEST_PASSED = "TEST_PASSED"
 TEST_FAILED = "TEST_FAILED"
 TEST_PASSED_WITHOUT_AI = "TEST_PASSED_WITHOUT_AI"
 
-def get_path(filename, idx, filetype="py"):
-    return "{}.{}".format(filename.replace(".py", "")+"_"+str(idx), filetype)
+def get_path(filename, idx, filetype="py", base_folder="."):
+    return "{}/{}.{}".format(base_folder, filename.replace(".py", "")+"_"+str(idx), filetype)
 
 class DeveloperAIHandler:
 
-    def __init__(self, key, test_file, code_file, full_context, print_context, print_message, ):
+    def __init__(self, key, test_file, code_file, full_context, print_context, print_message, logs_folder):
         self.client = OpenAI(api_key=key)
         self.role = "You are part of a Test Driven Development team. Your role is the development of code such that the provided code is fulfilled."
         self.messages_sent = []
@@ -24,31 +25,8 @@ class DeveloperAIHandler:
         self.full_context = full_context
         self.print_context = print_context
         self.print_message = print_message
-
-    def create_tdd_prompt(self):
-        trace = self.get_traces_of_last_run()
-        if trace == TEST_PASSED:
-            return TEST_PASSED
-        
-        prompt = ('Given the code and tests below and the trace created by the tests execution, modify the existent code so that the tests will pass.' +
-                  'The answer should only contain the code and no explanation.\n' + 
-                  'Code:\n ``' + self.get_code() + '``\n\n' +  
-                  'Tests:\n ``' + self.get_tests() + '``\n\n' +
-                  'Error trace:\n ``' + trace + '``') 
-
-        return prompt
-
-    def create_refactor_prompt(self):
-        
-        prompt = ('```python \n' +
-                  self.get_code() +
-                  '```\n' + 
-                  'Refactor the provided Python method to enhance its readability and maintainability.' + 
-                  'You can assume that the given method is functionally correct. Ensure that you do not ' + 
-                  'alter the external behavior of the method, maintaining both syntatic and semantic correctness.' +
-                  'Provide the Python method within a code block. Avoid using natural language explanations.')
-
-        return prompt 
+        self.logs_folder = logs_folder
+        os.makedirs(logs_folder, exist_ok=True)
 
 
     def save_context(self, context, idx_file):
@@ -67,7 +45,7 @@ class DeveloperAIHandler:
 
             text2save = text2save + "\n\n=================================================\n\n"
 
-        path = get_path(filename, idx_file, "txt").replace(".txt", "_context_developer.txt")
+        path = get_path(filename, idx_file, "txt", self.logs_folder).replace(".txt", "_context_developer.txt")
 
         with open(path, 'w') as file:
             file.write(text2save)
@@ -108,7 +86,7 @@ class DeveloperAIHandler:
         self.messages_sent.append(message)
         message = response.choices[0].message.content
 
-        path = get_path(self.code_file, idx, "txt").replace(".txt", "_response_developer.txt")
+        path = get_path(self.code_file, idx, "txt", self.logs_folder).replace(".txt", "_response_developer.txt")
         file_opener = open(path, 'w')
         file_opener.writelines(message)
         file_opener.close()
@@ -180,7 +158,7 @@ class DeveloperAIHandler:
         return file.read()
     
     def backup_code_file(self, idx):
-        shutil.copyfile(self.code_file, get_path(self.code_file, idx))
+        shutil.copyfile(self.code_file, get_path(self.code_file, idx, base_folder=self.logs_folder))
 
     def restore_code_file(self, idx):
-        shutil.copyfile(get_path(self.code_file, idx), self.code_file)
+        shutil.copyfile(get_path(self.code_file, idx, base_folder=self.logs_folder), self.code_file)

@@ -13,12 +13,12 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
     
-def how_many_to_skip(original_file, multiplier=1):
+def how_many_to_skip(original_file, logs_folder, multiplier=1):
     file_split = original_file.split("/")
     path = "/".join(file_split[0:len(file_split) - 1])
     path = "." if path == "" else path
     original_file = file_split[-1]
-    files = os.listdir(path)
+    files = os.listdir(logs_folder)
     search_file = original_file.replace(".py", "") + "_*.py"
     matching_files = [file for file in files if fnmatch.fnmatch(file, search_file)and len(file.replace(original_file.replace(".py", ""), "").split("_")) == multiplier +1]
     pattern = re.compile(r'\d+')

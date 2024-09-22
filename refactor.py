@@ -5,7 +5,7 @@ from utils import str2bool, how_many_to_skip
 
 class RefactorRunner():
 
-    def __init__(self, test_file, code_file, full_context, print_context, print_message, max_number_repetitions):
+    def __init__(self, test_file, code_file, full_context, print_context, print_message, max_number_repetitions, logs_folder):
 
         # Use variables
         openAI_key = os.getenv('OPEN_AI_KEY')
@@ -15,10 +15,23 @@ class RefactorRunner():
             code_file,
             full_context,  # send always the full context
             print_context,  # print the context
-            print_message  # print the message from OpenAI
+            print_message,  # print the message from OpenAI
+            logs_folder
         )
         self.max_number_repetitions = max_number_repetitions
-        self.skip = how_many_to_skip(code_file) + 1
+        self.skip = how_many_to_skip(code_file, logs_folder) + 1
+
+    def create_refactor_prompt(self):
+        
+        prompt = ('```python \n' +
+                  self.handler.get_code() +
+                  '```\n' + 
+                  'Refactor the provided Python method to enhance its readability and maintainability.' + 
+                  'You can assume that the given method is functionally correct. Ensure that you do not ' + 
+                  'alter the external behavior of the method, maintaining both syntatic and semantic correctness.' +
+                  'Provide the Python method within a code block. Avoid using natural language explanations.')
+
+        return prompt 
 
     def run(self):
         result = self.handler.execute_tests()
@@ -32,7 +45,7 @@ class RefactorRunner():
         self.handler.backup_code_file(self.skip)
         while counter < self.max_number_repetitions:
             counter += 1
-            self.handler.send_message(self.handler.create_refactor_prompt(), "{}_{}".format(self.skip, counter))
+            self.handler.send_message(self.create_refactor_prompt(), "{}_{}".format(self.skip, counter))
             self.handler.save_response_to_code_file()
             result = self.handler.execute_tests()
 
@@ -57,13 +70,14 @@ def params():
     # Add arguments
     parser.add_argument('--test_file', type=str, help='Path to the file with the tests.', default='test.py')
     parser.add_argument('--code_file', type=str, help='Path to the file with the code.', default='prod.py')
-    parser.add_argument('--full_context', type=str2bool, help='sending the full context to OpenAI.', default=False)
+    parser.add_argument('--full_context', type=str2bool, help='Sending the full context to OpenAI.', default=False)
     parser.add_argument('--print_context', type=str2bool, help='Printing the context before the it is send.',
                         default=False)
     parser.add_argument('--print_message', type=str2bool, help='Printing the message received from OpenAI.',
                         default=False)
     parser.add_argument('--max_number_repetitions', type=int,
                         help='Maximum number of chances given to OpenAI for solving a test case.', default=5)
+    parser.add_argument('--logs_folder', type=str, help='Folder to save the logs.', default='logs_refactor')
 
     # Parse the command-line arguments
     return parser.parse_args()
@@ -78,7 +92,8 @@ if __name__ == '__main__':
         parser.full_context,
         parser.print_context,
         parser.print_message,
-        parser.max_number_repetitions
+        parser.max_number_repetitions,
+        parser.logs_folder
     )
 
     runner.run()
