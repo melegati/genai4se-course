@@ -1,0 +1,6 @@
+User Story Title: As a delivery person, I cannot take over new shipments for a delivery day from the previous day
+Description: As a delivery person, I cannot take over new shipments for a delivery day from the previous day.
+Acceptance Criteria:
+As a delivery person, I receive the message “Shipments cannot be taken over to the registration from dd.mm.yyyy.” on the mobile device.
+(The delivery person must cleanly end and log off the open delivery day from the previous day [Delivery day.Date < Today])
+Text message shown (M123)

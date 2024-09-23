@@ -3,18 +3,16 @@ import subprocess
 import shutil
 import lizard
 import os
+from levelup.utils import get_path
 
 TEST_PASSED = "TEST_PASSED"
 TEST_FAILED = "TEST_FAILED"
 TEST_PASSED_WITHOUT_AI = "TEST_PASSED_WITHOUT_AI"
 
-def get_path(filename, idx, filetype="py", base_folder="."):
-    return "{}/{}.{}".format(base_folder, filename.replace(".py", "")+"_"+str(idx), filetype)
-
 class DeveloperAIHandler:
 
-    def __init__(self, key, test_file, code_file, full_context, print_context, print_message, logs_folder):
-        self.client = OpenAI(api_key=key)
+    def __init__(self, test_file, code_file, full_context, print_context, print_message, logs_folder):
+        self.client = OpenAI()
         self.role = "You are part of a Test Driven Development team. Your role is the development of code such that the provided code is fulfilled."
         self.messages_sent = []
         self.messages_received = []

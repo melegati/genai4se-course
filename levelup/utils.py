@@ -13,17 +13,23 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
     
+def get_extension(filename):
+    return filename.split(".")[-1]
+
 def how_many_to_skip(original_file, logs_folder, multiplier=1):
     file_split = original_file.split("/")
-    path = "/".join(file_split[0:len(file_split) - 1])
-    path = "." if path == "" else path
     original_file = file_split[-1]
+    extension = get_extension(original_file)
     files = os.listdir(logs_folder)
-    search_file = original_file.replace(".py", "") + "_*.py"
-    matching_files = [file for file in files if fnmatch.fnmatch(file, search_file)and len(file.replace(original_file.replace(".py", ""), "").split("_")) == multiplier +1]
+    search_file = original_file.replace(f".{extension}", "") + f"_*.{extension}"
+    matching_files = [file for file in files if fnmatch.fnmatch(file, search_file) and len(file.replace(original_file.replace(f".{extension}", ""), "").split("_")) == multiplier + 1]
     pattern = re.compile(r'\d+')
 
     # Extract numbers from each filename and create an array
     numbers_array = [int(pattern.search(file).group()) for file in matching_files if pattern.search(file)]
     files_to_skip = max(numbers_array) if len(numbers_array) > 0 else 0
     return files_to_skip
+
+def get_path(filename, idx, filetype="py", base_folder="."):
+    extension = get_extension(filename)
+    return "{}/{}.{}".format(base_folder, filename.replace(f".{extension}", "")+"_"+str(idx), filetype)

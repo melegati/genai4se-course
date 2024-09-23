@@ -5,4 +5,5 @@ logs/
 metagpt/
 logs_tdd/
 logs_refactor/
-tdd_logs/
+logs_userstories/
+

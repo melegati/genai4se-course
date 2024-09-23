@@ -1,6 +1,5 @@
 import sys
 import argparse
-import os
 
 from levelup.DeveloperAIHandler import DeveloperAIHandler, TEST_FAILED, TEST_PASSED
 from levelup.utils import str2bool, how_many_to_skip
@@ -11,10 +10,7 @@ class TDDRunner():
 
     def __init__(self, test_file, code_file, full_context, print_context, print_message, max_number_repetitions, logs_folder):
 
-        # Use variables
-        openAI_key = os.getenv('OPEN_AI_KEY')
         self.handler = DeveloperAIHandler(
-            openAI_key,
             test_file,  
             code_file,
             full_context,  # send always the full context
@@ -67,8 +63,8 @@ def params():
     parser = argparse.ArgumentParser(description='Description of your program.')
 
     # Add arguments
-    parser.add_argument('--test_file', type=str, help='Path to the file with the tests.', default='test.py')
-    parser.add_argument('--code_file', type=str, help='Path to the file with the code.', default='prod.py')
+    parser.add_argument('-t', '--test_file', type=str, help='Path to the file with the tests.', default='test.py')
+    parser.add_argument('-c', '--code_file', type=str, help='Path to the file with the code.', default='code.py')
     parser.add_argument('--full_context', type=str2bool, help='sending the full context to OpenAI.', default=False)
     parser.add_argument('--print_context', type=str2bool, help='Printing the context before the it is send.',
                         default=False)
