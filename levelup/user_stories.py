@@ -28,7 +28,8 @@ class ActionSequenceRole(Role):
 
 def improve(userstory):
 
-    gpt4omini = Config.default()
+    llm_config = { "api_type": "openai", "api_key": os.getenv("OPENAI_API_KEY"), "model": "gpt-4o-mini" }
+    gpt4omini = Config.from_llm_config(llm_config)
 
     initiate_analysis = Action(name="Initiate analysis", 
                             instruction="Given the provided user story, perform an initial analysis regarding the criteria: independent, negotiable, valuable, estimable, small, and testable.")

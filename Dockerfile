@@ -7,6 +7,11 @@ COPY levelup/*.py levelup/.
 
 RUN pip install -r requirements.txt
 
-ENV OPENAI_API_MODEL="gpt-4o-mini"
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y git
+RUN metagpt --init-config
 
-CMD ["/bin/sh","-c","\"while sleep 1000; do :; done\""]
+COPY config2.yaml /root/.metagpt/.
+
+CMD ["/bin/sh","-c","while sleep 1000; do :; done"]
