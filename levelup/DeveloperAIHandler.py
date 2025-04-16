@@ -3,6 +3,7 @@ import subprocess
 import shutil
 import lizard
 import os
+import sys
 from levelup.utils import get_path
 
 TEST_PASSED = "TEST_PASSED"
@@ -128,7 +129,7 @@ class DeveloperAIHandler:
         return "\n".join(result)
 
     def execute_tests(self):
-        result_sub_process = subprocess.run(["python", self.test_file], stdout=subprocess.PIPE,
+        result_sub_process = subprocess.run([sys.executable, self.test_file], stdout=subprocess.PIPE,
                                             stderr=subprocess.PIPE, universal_newlines=True)
         print(result_sub_process.stderr)
         if "OK" not in result_sub_process.stderr.split("\n")[-2]:
