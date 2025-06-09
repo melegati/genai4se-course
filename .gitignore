@@ -4,3 +4,6 @@ devign
 output
 defects4j
 .DS_Store
+mcp-example/env
+mcp-example/defects4j
+.vscode
