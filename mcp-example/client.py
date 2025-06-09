@@ -45,6 +45,7 @@ class MCPClient:
             messages.append(response)
 
             for tool_call in response.tool_calls:
+                print('Calling {} with args {}'.format(tool_call['name'], tool_call['args']))
                 result = await self.session.call_tool(tool_call['name'], tool_call['args'])
                 messages.append(ToolMessage(content = result.content[0], tool_call_id = tool_call['id']))
 
