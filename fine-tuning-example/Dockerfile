@@ -4,6 +4,14 @@ FROM quay.io/jupyter/base-notebook:python-3.12
 # Set the working directory
 WORKDIR /home/jovyan/work
 
+USER root
+
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install unzip
+
+USER $NB_UID
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
