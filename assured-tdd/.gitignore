@@ -1,0 +1,9 @@
+.DS_Store
+__pycache__
+env/
+logs/
+metagpt/
+logs_tdd/
+logs_refactor/
+logs_userstories/
+
