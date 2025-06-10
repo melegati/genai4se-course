@@ -1,12 +1,13 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-WORKDIR /levelup
+WORKDIR /assured-tdd
 
 RUN apt-get update && \
     apt-get upgrade -y
 
 COPY requirements.txt .
-COPY levelup/*.py levelup/.
+COPY tdd/*.py tdd/.
+COPY *.py .
 
 RUN pip install -r requirements.txt
 

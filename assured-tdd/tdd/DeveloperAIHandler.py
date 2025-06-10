@@ -4,7 +4,7 @@ import shutil
 import lizard
 import os
 import sys
-from levelup.utils import get_path
+from tdd.utils import get_path
 
 TEST_PASSED = "TEST_PASSED"
 TEST_FAILED = "TEST_FAILED"
